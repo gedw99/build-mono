@@ -1,20 +1,27 @@
-BIN_NAME=.bin
-BIN_ROOT=$(PWD)/$(BIN_NAME)
+
+
+BIN_ROOT_NAME=.bin
+BIN_ROOT=$(PWD)/$(BIN_ROOT_NAME)
 
 export PATH:=$(BIN_ROOT):$(PATH)
 
+this-print:
+	@echo "build-mono"
 
-print:
+include spok.mk
 
-all: src bin 
+this: this-dep this-src this-bin 
 
-dep:
-	brew install goreleaser/tap/goreleaser
+this-dep:
+	mkdir -p $(BIN_ROOT)
+	@echo $(BIN_ROOT_NAME) >> .gitignore
 
-src:
-	git clone https://github.com/gedw99/build-mono
+	#brew install goreleaser/tap/goreleaser
 
-bin:
+this-src: spok-src
+
+
+this-bin: spok-bin
 	
 install:
 	cp $(BIN_ROOT)/spok $(GOPATH)/bin/spok
