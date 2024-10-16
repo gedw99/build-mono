@@ -13,15 +13,13 @@ include spok.mk
 this: this-dep this-src this-bin 
 
 this-dep:
-	
-	@echo $(BIN_ROOT_NAME) >> .gitignore
-
-	#brew install goreleaser/tap/goreleaser
+	go install github.com/goreleaser/goreleaser/v2@latest
 
 this-src: spok-src
 
 this-bin-del:
 	rm -rf $(BIN_ROOT)
 	mkdir -p $(BIN_ROOT)
+	@echo $(BIN_ROOT_NAME) >> .gitignore
 this-bin: this-bin-del spok-bin
 	
