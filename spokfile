@@ -1,0 +1,22 @@
+
+
+# Tidy up dependencies in go.mod and go.sum
+task tidy("go.mod", "go.sum", "**/*.go") {
+    go mod tidy
+}
+
+# Run go fmt on all project files
+task fmt("**/*.go") {
+    go fmt ./...
+}
+
+# Install the project on your machine
+task install(uninstall, build) {
+    cp {{.PROJECT_BIN}}/{{.PROJECT_NAME}} $GOBIN/
+}
+
+# Uninstall the project from your machine
+task uninstall() {
+    rm -rf $GOBIN/{{.PROJECT_NAME}}
+}
+
