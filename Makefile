@@ -56,7 +56,7 @@ this-print:
 
 include spok.mk
 
-this: this-print this-dep this-src this-bin
+this: this-dep this-print  this-src this-bin
 
 
 WHICH_BIN_NAME=go-which
@@ -185,6 +185,12 @@ this-release-del: this-release-dep
 	$(GH_BIN_NAME) release delete $(GH_RUN_RELEASE_TAG) --yes
 this-release-ls: this-release-dep
 	$(GH_BIN_NAME) release list
+this-release-actions-ls: this-release-dep
+	$(GH_BIN_NAME) actions -h
+
+	$(GH_BIN_NAME) cache list
+	$(GH_BIN_NAME) run list
+
 
 this-release-h: this-release-dep
 	gh release -h
