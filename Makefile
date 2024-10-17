@@ -70,15 +70,8 @@ this-src: this-src-print this-src-dep spok-src
 this-bin-print: this-bin-dep
 	@echo ""
 	@echo "-- bin "
-	@echo "GORELEASER_BIN_NAME:           $(GORELEASER_BIN_NAME)"
-	@echo "GORELEASER_BIN_WHICH:          $(GORELEASER_BIN_WHICH)"
 	@echo ""
 
-GORELEASER_BIN_NAME=goreleaser
-ifeq ($(BASE_OS_NAME),windows)
-	GORELEASER_BIN_NAME=gh.exe
-endif
-GORELEASER_BIN_WHICH=$(shell command -v $(GORELEASER_BIN_NAME))
 this-bin-dep:
 	@echo ""
 	@echo "-- bin dep "
@@ -90,17 +83,6 @@ this-bin-dep:
 ifeq ($(GITHUB_ACTIONS), )
 	@echo ""
 	@echo " NOT inside github "
-
-ifeq ($(GORELEASER_BIN_WHICH), )
-	@echo ""
-	@echo "$(GORELEASER_BIN_NAME) dep check: failed"
-	# https://github.com/goreleaser/goreleaser/releases/tag/v2.3.2
-	go install github.com/goreleaser/goreleaser/v2@v2.3.2
-else
-	@echo ""
-	@echo "$(GORELEASER_BIN_NAME) dep check: passed"
-	@echo ""
-endif
 else
 	@echo ""
 	@echo " Inside github "
@@ -110,6 +92,7 @@ endif
 
 ## bin
 this-bin: this-bin-print this-bin-dep spok-bin
+
 
 
 ### release 
