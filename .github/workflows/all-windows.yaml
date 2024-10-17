@@ -16,13 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  all:
-    name: All
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - windows-latest
+  build:
+    name: windows-build
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Code

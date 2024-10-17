@@ -16,14 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  all:
-    name: All
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - macos-latest
-          
+  build:
+    name: darwin-build
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code

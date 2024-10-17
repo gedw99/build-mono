@@ -16,13 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  all:
-    name: All
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
+  build:
+    name: linux-build
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
