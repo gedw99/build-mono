@@ -67,7 +67,8 @@ ifeq ($(BASE_CI_GITHUB), )
 	WHICH_BIN_TEMP_NAME=which.exe
 endif
 endif
-WHICH_BIN_WHICH=$(shell command -v $(WHICH_BIN_NAME))
+#WHICH_BIN_WHICH=$(shell command -v $(WHICH_BIN_NAME))
+WHICH_BIN_WHICH=$(shell $(WHICH_BIN_NAME) $(WHICH_BIN_NAME))
 this-dep-print:
 	@echo ""
 	@echo "-- dep"
