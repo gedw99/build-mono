@@ -205,9 +205,9 @@ this-release: this-release-print this-release-dep
 	@echo "-- release"
 	@echo ""
 	@echo ""
-	$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
+	#$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
 	#$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/* --clobber
-	$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/*
+	#$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/*
 
 	@echo ""
 	@echo "here it is:"
