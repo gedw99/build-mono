@@ -7,6 +7,10 @@ BASE_SHELL_OS_ARCH := $(shell uname -m | tr A-Z a-z)
 BASE_OS_NAME := $(shell go env GOOS)
 BASE_OS_ARCH := $(shell go env GOARCH)
 
+# ci
+BASE_CI=
+
+# git
 BASE_GITROOT=$(shell git rev-parse --show-toplevel)
 
 # constants for bin targets
@@ -29,19 +33,35 @@ BASE_BIN_ROOT=$(PWD)/$(BASE_BIN_ROOT_NAME)
 
 export PATH:=$(BASE_BIN_ROOT):$(PATH)
 
+
+
+this-init:
+
+ifeq ($(GITHUB_ACTIONS), )
+	@echo ""
+	@echo " NOT inside github "
+else
+	@echo ""
+	@echo " Inside github "
+	$(BASE_CI)=github
+	@echo ""
+endif
+
 ## print
-this-print:
+this-print: this-init
 	@echo ""
 	@echo "build-mono"
 	@echo ""
-	@echo "BASE_OS_NAME: $(BASE_OS_NAME)"
-	@echo "BASE_OS_ARCH: $(BASE_OS_ARCH)"
+	@echo "BASE_OS_NAME:           $(BASE_OS_NAME)"
+	@echo "BASE_OS_ARCH:           $(BASE_OS_ARCH)"
 	@echo ""
-	@echo "BASE_GITROOT: $(BASE_GITROOT)"
+	@echo "BASE_CI:                $(BASE_CI)"
+	@echo ""
+	@echo "BASE_GITROOT:           $(BASE_GITROOT)"
 	@echo ""
 	@echo "BASE_BIN_SUFFIX_NATIVE: $(BASE_BIN_SUFFIX_NATIVE)"
 	@echo ""
-	@echo "BASE_BIN_ROOT: $(BASE_BIN_ROOT)"
+	@echo "BASE_BIN_ROOT:          $(BASE_BIN_ROOT)"
 	@echo ""
 
 include spok.mk
@@ -59,6 +79,7 @@ this-src-print: this-src-dep
 	@echo ""
 this-src-dep:
 	@echo ""
+	@echo "--src-dep "
 	@echo "no deps needed. git is assumed. "
 	@echo ""
 ## src
@@ -74,20 +95,12 @@ this-bin-print: this-bin-dep
 
 this-bin-dep:
 	@echo ""
-	@echo "-- bin dep "
+	@echo "-- bin-dep "
 	@echo ""
 	rm -rf $(BASE_BIN_ROOT)
 	mkdir -p $(BASE_BIN_ROOT)
 	@echo $(BASE_BIN_ROOT_NAME) >> .gitignore
 
-ifeq ($(GITHUB_ACTIONS), )
-	@echo ""
-	@echo " NOT inside github "
-else
-	@echo ""
-	@echo " Inside github "
-	@echo ""
-endif
 
 
 ## bin
@@ -99,7 +112,9 @@ this-bin: this-bin-print this-bin-dep spok-bin
 
 GH_BIN_NAME=gh
 ifeq ($(BASE_OS_NAME),windows)
+ifeq ($(BASE_CI),)
 	GH_BIN_NAME=gh.exe
+endif
 endif
 GH_BIN_VERSION=v2.59.0
 GH_BIN_WHICH=$(shell command -v $(GH_BIN_NAME))
@@ -114,7 +129,7 @@ GH_RUN_RELEASE_URL_DOWNLOAD=
 # https://github.com/gedw99/build-mono/releases/download/360a6ef/spok_bin_darwin_arm64
 
 
-this-release-print:
+this-release-print: this-release-dep
 	@echo ""
 	@echo "-- release"
 	@echo "GH_BIN_NAME:                $(GH_BIN_NAME)"
@@ -126,6 +141,7 @@ this-release-print:
 	@echo "GH_RUN_RELEASE_TAG_OTHER:   $(GH_RUN_RELEASE_TAG_OTHER)"
 	@echo "GH_RUN_RELEASE_URL:         $(GH_RUN_RELEASE_URL)"
 	@echo ""
+	
 this-release-dep:
 	
 ifeq ($(GH_BIN_WHICH), )
@@ -160,7 +176,7 @@ this-release-tag:
 	git push --force --tags
 	git tag -l
 ## release
-this-release: this-release-dep 
+this-release: this-release-print this-release-dep 
 	@echo ""
 	@echo "-- release"
 	@echo ""
