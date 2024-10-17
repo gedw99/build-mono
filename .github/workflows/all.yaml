@@ -37,8 +37,10 @@ jobs:
 
       - name: Run Make build
         run: make this
+        shell: bash
 
       - name: Run Make release
         run: make this-release
+        shell: bash
 
   
