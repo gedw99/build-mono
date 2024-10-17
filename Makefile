@@ -56,7 +56,43 @@ include spok.mk
 this: this-print this-dep this-src this-bin
 
 
-this-dep: 
+WHICH_BIN_NAME=go-which
+WHICH_BIN_TEMP_NAME=which
+ifeq ($(BASE_OS_NAME),windows)
+ifeq ($(BASE_CI_GITHUB), )
+	WHICH_BIN_NAME=go-which.exe
+	WHICH_BIN_TEMP_NAME=which.exe
+endif
+endif
+WHICH_BIN_WHICH=$(shell command -v $(WHICH_BIN_NAME))
+this-dep-print:
+	@echo ""
+	@echo "-- dep"
+	@echo ""
+	@echo "GH_BIN_WHICH: $(GH_BIN_WHICH)"
+this-dep-del:
+	rm -rf $(WHICH_BIN_WHICH)
+this-dep:
+	# MUST do this FIRST thing, because the other things need it.
+ifeq ($(WHICH_BIN_WHICH), )
+	@echo ""
+	@echo "$(WHICH_BIN_NAME) dep check: failed"
+	# https://github.com/hairyhenderson/go-which/releases/tag/v0.2.0
+	go install github.com/hairyhenderson/go-which/cmd/which@v0.2.0
+	mv $(GOPATH)/bin/$(WHICH_BIN_TEMP_NAME) $(GOPATH)/bin/$(WHICH_BIN_NAME)
+else
+	@echo ""
+	@echo "$(WHICH_BIN_NAME) dep check: passed"
+	@echo ""
+endif
+
+	#$(WHICH_BIN_NAME) -h 
+	#$(WHICH_BIN_NAME) -a which
+
+	# Later: https://github.com/scottlepp/go-duck
+	# Use which, and i realise it wil give me the equivalent of PATH searching cross platform.
+
+
 	
 ## src
 
@@ -89,7 +125,6 @@ this-bin-dep:
 	@echo $(BASE_BIN_ROOT_NAME) >> .gitignore
 
 
-
 ## bin
 this-bin: this-bin-print this-bin-dep spok-bin
 
@@ -104,7 +139,7 @@ ifeq ($(BASE_CI_GITHUB), )
 endif
 endif
 GH_BIN_VERSION=v2.59.0
-GH_BIN_WHICH=$(shell command -v $(GH_BIN_NAME))
+GH_BIN_WHICH=$(shell $(WHICH_BIN_NAME) $(GH_BIN_NAME))
 
 # We use this for now. Later distinguish between a PR and a TAG. We still upload to same place, so its EASY !
 GH_RUN_RELEASE_TAG=$(shell git rev-parse --short HEAD)
@@ -129,7 +164,7 @@ this-release-print: this-release-dep
 	@echo "GH_RUN_RELEASE_URL:         $(GH_RUN_RELEASE_URL)"
 	@echo ""
 	
-this-release-dep:
+this-release-dep: this-dep
 	
 ifeq ($(GH_BIN_WHICH), )
 	@echo ""
@@ -145,7 +180,6 @@ endif
 this-release-del: this-release-dep
 	#gh release delete -h
 	$(GH_BIN_NAME) release delete $(GH_RUN_RELEASE_TAG) --yes
-
 this-release-ls: this-release-dep
 	$(GH_BIN_NAME) release list
 
@@ -186,7 +220,7 @@ BASE_DEP_BIN_WGOT_VERSION=v0.7.0
 ifeq ($(BASE_OS_NAME),windows)
 	BASE_DEP_BIN_WGOT_NAME=wgot.exe
 endif
-BASE_DEP_BIN_WGOT_WHICH=$(shell command -v $(BASE_DEP_BIN_WGOT_NAME))
+BASE_DEP_BIN_WGOT_WHICH=$(shell $(WHICH_BIN_NAME) $(BASE_DEP_BIN_WGOT_NAME))
 
 BASE_DEP_BIN_WGOT_RUN_NAME=.bin_download
 BASE_DEP_BIN_WGOT_RUN_PATH=$(PWD)/$(BASE_DEP_BIN_WGOT_RUN_NAME)
@@ -201,7 +235,7 @@ this-download-print:
 	@echo "BASE_DEP_BIN_WGOT_RUN_PATH:  $(BASE_DEP_BIN_WGOT_RUN_PATH)"
 	@echo ""
 
-this-download-dep:
+this-download-dep: this-dep
 ifeq ($(BASE_DEP_BIN_WGOT_WHICH), )
 	@echo ""
 	@echo " $(BASE_DEP_BIN_WGOT_NAME) check: failed"
