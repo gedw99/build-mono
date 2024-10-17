@@ -61,17 +61,18 @@ this-src-dep:
 	@echo ""
 	@echo "no deps needed. git is assumed. "
 	@echo ""
-this-src: this-src-dep spok-src
+## src
+this-src: this-src-print this-src-dep spok-src
 
 
 ### bin
 
-this-bin-print:
+this-bin-print: this-bin-dep
 	@echo ""
-	@echo "-- bin release"
+	@echo "-- bin "
 	@echo "GORELEASER_BIN_NAME:           $(GORELEASER_BIN_NAME)"
 	@echo "GORELEASER_BIN_WHICH:          $(GORELEASER_BIN_WHICH)"
-
+	@echo ""
 
 GORELEASER_BIN_NAME=goreleaser
 ifeq ($(BASE_OS_NAME),windows)
@@ -79,6 +80,9 @@ ifeq ($(BASE_OS_NAME),windows)
 endif
 GORELEASER_BIN_WHICH=$(shell command -v $(GORELEASER_BIN_NAME))
 this-bin-dep:
+	@echo ""
+	@echo "-- bin "
+	@echo ""
 	rm -rf $(BASE_BIN_ROOT)
 	mkdir -p $(BASE_BIN_ROOT)
 	@echo $(BASE_BIN_ROOT_NAME) >> .gitignore
@@ -95,7 +99,10 @@ else
 endif
 
 ## bin
-this-bin: this-bin-dep spok-bin
+this-bin: this-bin-print this-bin-dep spok-bin
+
+
+### release 
 
 GH_BIN_NAME=gh
 ifeq ($(BASE_OS_NAME),windows)
@@ -116,7 +123,7 @@ GH_RUN_RELEASE_URL_DOWNLOAD=
 
 this-release-print:
 	@echo ""
-	@echo "-- gh release"
+	@echo "-- release"
 	@echo "GH_BIN_NAME:                $(GH_BIN_NAME)"
 	@echo "GH_BIN_VERSION:             $(GH_BIN_VERSION)"
 	@echo "GH_BIN_WHICH:               $(GH_BIN_WHICH)"
@@ -144,18 +151,24 @@ this-release-del: this-release-dep
 
 this-release-ls: this-release-dep
 	$(GH_BIN_NAME) release list
-## release
+
 this-release-h: this-release-dep
-	gh release create -h
+	gh release -h
+	#gh release create -h
 	#gh release upload -h
+this-release-tag:
+	@echo ""
+	@echo "tags ?"
+	git fetch --force --tags
+	git tag -l
+	git tag --force $(GH_RUN_RELEASE_TAG)  -m "PR Release version $(GH_RUN_RELEASE_TAG)"
+	#git push --tags
+	git push --force --tags
+	git tag -l
+## release
 this-release: this-release-dep 
 	@echo ""
 	@echo "-- release"
-	@echo ""
-	@echo "tags ?"
-	git tag -l
-	git tag --force $(GH_RUN_RELEASE_TAG)
-	git tag -l
 	@echo ""
 	@echo ""
 	#$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
@@ -206,6 +219,7 @@ endif
 	mkdir -p $(BASE_DEP_BIN_WGOT_RUN_PATH)
 	@echo $(BASE_DEP_BIN_WGOT_RUN_NAME) >> .gitignore
 
+## download
 this-download: this-download-dep spok-download
 	$(BASE_DEP_BIN_WGOT_NAME) -o $(BASE_DEP_BIN_WGOT_RUN_PATH)/$(SPOK_BIN_NATIVE) $(GH_RUN_RELEASE_URL)/$(SPOK_BIN_NATIVE)
 

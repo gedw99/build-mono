@@ -1,0 +1,47 @@
+name: all-darwin.yaml
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  all:
+    name: All
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run Make build
+        run: make this
+        shell: bash
+
+      - name: Run Make release
+        run: make this-release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  
