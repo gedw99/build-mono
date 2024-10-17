@@ -35,14 +35,10 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Run Make
+      - name: Run Make build
         run: make this
 
-      - name: Upload Release Asset
-        run: |
-          ls -al
-          #gh release upload ${{ github.event.release.tag_name }} ./bin/spok
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+      - name: Run Make release
+        run: make this-release
+
   

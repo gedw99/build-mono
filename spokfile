@@ -1,0 +1,74 @@
+# This is a spokfile designed to be equivalent to the current
+# justfile in the repo root, meant as a realistic example for
+# a live project
+
+PROJECT_NAME := "spok"
+PROJECT_PATH := "github.com/FollowTheProcess/spok"
+PROJECT_BIN := join(".", "bin")
+PROJECT_ENTRY_POINT := join(".", "cmd", "spok")
+COVERAGE_DATA := join(".", "coverage.out")
+COVERAGE_HTML := join(".", "coverage.html")
+GORELEASER_DIST := join(".", "dist")
+COMMIT_SHA := exec("git rev-parse HEAD")
+VERSION_LDFLAG := "github.com/FollowTheProcess/spok/cli/cmd.version"
+COMMIT_LDFLAG := "github.com/FollowTheProcess/spok/cli/cmd.commit"
+FORCE_COLOR := "1"
+PRE_COMMIT_COLOR := "always"
+
+# Tidy up dependencies in go.mod and go.sum
+task tidy("go.mod", "go.sum", "**/*.go") {
+    go mod tidy
+}
+
+# Compile the project binary
+task build("**/*.go", "go.sum") -> (PROJECT_BIN, GORELEASER_DIST) {
+    go generate ./...
+    go fmt ./...
+    mkdir -p {{.PROJECT_BIN}}
+    goreleaser build --single-target --skip=before --snapshot --clean --output {{.PROJECT_BIN}}/{{.PROJECT_NAME}}
+}
+
+# Run go fmt on all project files
+task fmt("**/*.go") {
+    go fmt ./...
+}
+
+# Run all project tests
+task test("**/*.go") {
+    SPOK_INTEGRATION_TEST=true go test -race ./...
+}
+
+# Run all project benchmarks
+task bench("**/*.go") {
+    go test ./... -run=None -benchmem -bench .
+}
+
+# Lint the project and auto-fix errors if possible
+task lint("**/*.go") {
+    golangci-lint run --fix
+}
+
+# Run tests and linting
+task check(test, lint) {}
+
+# Calculate test coverage and render the html
+task cover("**/*.go") -> (COVERAGE_DATA, COVERAGE_HTML) {
+    SPOK_INTEGRATION_TEST=true go test -race -cover -covermode=atomic -coverprofile={{.COVERAGE_DATA}} ./...
+    go tool cover -html={{.COVERAGE_DATA}} -o {{.COVERAGE_HTML}}
+    open {{.COVERAGE_HTML}}
+}
+
+# Print lines of code (for fun)
+task sloc() {
+    find . -name "*.go" | xargs wc -l | sort -nr | head
+}
+
+# Install the project on your machine
+task install(uninstall, build) {
+    cp {{.PROJECT_BIN}}/{{.PROJECT_NAME}} $GOBIN/
+}
+
+# Uninstall the project from your machine
+task uninstall() {
+    rm -rf $GOBIN/{{.PROJECT_NAME}}
+}

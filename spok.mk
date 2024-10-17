@@ -1,9 +1,11 @@
 
 
 spok-print:
+	@echo ""
 	@echo "spok"
+	@echo ""
 
-spok-all: spok-src spok-bin
+spok-all: spok-print spok-src spok-bin
 
 spok-src:
 	rm -rf spok
