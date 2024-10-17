@@ -3,7 +3,7 @@
 spok-print:
 	@echo "spok"
 
-spok-all: spok-src spok-bin 
+spok-all: spok-src spok-bin
 
 spok-src:
 	rm -rf spok

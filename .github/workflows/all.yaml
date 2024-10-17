@@ -40,7 +40,8 @@ jobs:
 
       - name: Upload Release Asset
         run: |
-          gh release upload ${{ github.event.release.tag_name }} ./bin/spok
+          ls -al
+          #gh release upload ${{ github.event.release.tag_name }} ./bin/spok
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
