@@ -19,10 +19,11 @@ spok-src:
 spok-bin:
 	touch go.work
 	go work use spok
-	cd spok && goreleaser build --single-target --skip=before --snapshot --clean --output $(BASE_BIN_ROOT)/$(SPOK_BIN_NATIVE)
+	cd spok && $(GORELEASER_BIN_NAME) build --single-target --skip=before --snapshot --clean --output $(BASE_BIN_ROOT)/$(SPOK_BIN_NATIVE)
 
 spok-download:
-	cd $(BASE_DEP_BIN_WGOT_RUN_PATH) && $(BASE_DEP_BIN_WGOT_NAME) -o $(SPOK_BIN_NATIVE) $(GH_RUN_RELEASE_URL)/$(SPOK_BIN_NATIVE)
+	$(BASE_DEP_BIN_WGOT_NAME) -o $(BASE_DEP_BIN_WGOT_RUN_PATH)/$(SPOK_BIN_NATIVE) $(GH_RUN_RELEASE_URL)/$(SPOK_BIN_NATIVE)
+	#cd $(BASE_DEP_BIN_WGOT_RUN_PATH) && $(BASE_DEP_BIN_WGOT_NAME) -o $(SPOK_BIN_NATIVE) $(GH_RUN_RELEASE_URL)/$(SPOK_BIN_NATIVE)
 
 spok-install:
 	#cp $(BASE_BIN_ROOT)/spok $(GOPATH)/bin/spok

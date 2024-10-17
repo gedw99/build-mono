@@ -52,12 +52,31 @@ this: this-print this-dep this-src this-bin
 this-dep: 
 	
 ## src
-this-src: spok-src
+
+this-src-print: this-src-dep
+	@echo ""
+	@echo "--src "
+	@echo ""
+this-src-dep:
+	@echo ""
+	@echo "no deps needed. git is assumed. "
+	@echo ""
+this-src: this-src-dep spok-src
 
 
 ### bin
 
+this-bin-print:
+	@echo ""
+	@echo "-- bin release"
+	@echo "GORELEASER_BIN_NAME:           $(GORELEASER_BIN_NAME)"
+	@echo "GORELEASER_BIN_WHICH:          $(GORELEASER_BIN_WHICH)"
+
+
 GORELEASER_BIN_NAME=goreleaser
+ifeq ($(BASE_OS_NAME),windows)
+	GORELEASER_BIN_NAME=gh.exe
+endif
 GORELEASER_BIN_WHICH=$(shell command -v $(GORELEASER_BIN_NAME))
 this-bin-dep:
 	rm -rf $(BASE_BIN_ROOT)
@@ -85,8 +104,11 @@ endif
 GH_BIN_VERSION=v2.59.0
 GH_BIN_WHICH=$(shell command -v $(GH_BIN_NAME))
 
+# We use this for now. Later distinguish between a PR and a TAG. We still upload to same place, so its EASY !
 GH_RUN_RELEASE_TAG=$(shell git rev-parse --short HEAD)
+
 GH_RUN_RELEASE_TAG_LONG=$(shell git rev-parse HEAD)
+GH_RUN_RELEASE_TAG_OTHER=$(shell git describe --tags)
 GH_RUN_RELEASE_URL=$(shell git config --get remote.origin.url)/releases/tag/$(GH_RUN_RELEASE_TAG)
 GH_RUN_RELEASE_URL_DOWNLOAD=
 # https://github.com/gedw99/build-mono/releases/download/360a6ef/spok_bin_darwin_arm64
@@ -100,8 +122,8 @@ this-release-print:
 	@echo "GH_BIN_WHICH:               $(GH_BIN_WHICH)"
 	@echo ""
 	@echo "GH_RUN_RELEASE_TAG:         $(GH_RUN_RELEASE_TAG)"
-	@echo "GH_RUN_RELEASE_TAG:         $(GH_RUN_RELEASE_TAG)"
 	@echo "GH_RUN_RELEASE_TAG_LONG:    $(GH_RUN_RELEASE_TAG_LONG)"
+	@echo "GH_RUN_RELEASE_TAG_OTHER:   $(GH_RUN_RELEASE_TAG_OTHER)"
 	@echo "GH_RUN_RELEASE_URL:         $(GH_RUN_RELEASE_URL)"
 	@echo ""
 this-release-dep:
@@ -126,7 +148,16 @@ this-release-ls: this-release-dep
 this-release-h: this-release-dep
 	gh release create -h
 	#gh release upload -h
-this-release: this-release-dep
+this-release: this-release-dep 
+	@echo ""
+	@echo "-- release"
+	@echo ""
+	@echo "tags ?"
+	git tag -l
+	git tag --force $(GH_RUN_RELEASE_TAG)
+	git tag -l
+	@echo ""
+	@echo ""
 	#$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
 	#$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/* --clobber
 	$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/*
@@ -136,6 +167,9 @@ this-release: this-release-dep
 	@echo "GH_RUN_RELEASE_URL: $(GH_RUN_RELEASE_URL)"
 	@echo ""
 
+
+
+### download
 
 BASE_DEP_BIN_WGOT_NAME=wgot
 BASE_DEP_BIN_WGOT_VERSION=v0.7.0
@@ -173,6 +207,8 @@ endif
 	@echo $(BASE_DEP_BIN_WGOT_RUN_NAME) >> .gitignore
 
 this-download: this-download-dep spok-download
+	$(BASE_DEP_BIN_WGOT_NAME) -o $(BASE_DEP_BIN_WGOT_RUN_PATH)/$(SPOK_BIN_NATIVE) $(GH_RUN_RELEASE_URL)/$(SPOK_BIN_NATIVE)
+
 	
 
 
