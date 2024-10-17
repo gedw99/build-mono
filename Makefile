@@ -87,6 +87,10 @@ this-bin-dep:
 	mkdir -p $(BASE_BIN_ROOT)
 	@echo $(BASE_BIN_ROOT_NAME) >> .gitignore
 
+ifeq ($(GITHUB_ACTIONS), )
+	@echo ""
+	@echo " NOT inside github "
+
 ifeq ($(GORELEASER_BIN_WHICH), )
 	@echo ""
 	@echo "$(GORELEASER_BIN_NAME) dep check: failed"
@@ -97,6 +101,12 @@ else
 	@echo "$(GORELEASER_BIN_NAME) dep check: passed"
 	@echo ""
 endif
+else
+	@echo ""
+	@echo " Inside github "
+	@echo ""
+endif
+
 
 ## bin
 this-bin: this-bin-print this-bin-dep spok-bin
@@ -134,6 +144,7 @@ this-release-print:
 	@echo "GH_RUN_RELEASE_URL:         $(GH_RUN_RELEASE_URL)"
 	@echo ""
 this-release-dep:
+	
 ifeq ($(GH_BIN_WHICH), )
 	@echo ""
 	@echo "$(GH_BIN_NAME) dep check: failed"
