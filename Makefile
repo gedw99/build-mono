@@ -4,11 +4,12 @@ BASE_SHELL_OS_NAME := $(shell uname -s | tr A-Z a-z)
 BASE_SHELL_OS_ARCH := $(shell uname -m | tr A-Z a-z)
 
 # os
-BASE_OS_NAME := $(shell go env GOOS)
-BASE_OS_ARCH := $(shell go env GOARCH)
+BASE_GOOS_NAME := $(shell go env GOOS)
+BASE_GOOS_ARCH := $(shell go env GOARCH)
+BASE_GOOS_PATH := $(shell go env GOPATH)
 
 # ci
-BASE_CI_GITHUB=$(GITHUB_ACTIONS)
+BASE_CI_GITHUB := $(GITHUB_ACTIONS)
 
 # git
 BASE_GITROOT=$(shell git rev-parse --show-toplevel)
@@ -23,9 +24,9 @@ BASE_BIN_SUFFIX_WINDOWS_ARM64=bin_windows_arm64.exe
 BASE_BIN_SUFFIX_WASM=bin_js_wasm
 
 # used for naming all binaries suffix.
-BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_OS_NAME)_$(BASE_OS_ARCH)
-ifeq ($(BASE_OS_NAME),windows)
-	BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_OS_NAME)_$(BASE_OS_ARCH).exe
+BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_GOOS_NAME)_$(BASE_GOOS_ARCH)
+ifeq ($(BASE_GOOS_NAME),windows)
+	BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_GOOS_NAME)_$(BASE_GOOS_ARCH).exe
 endif
 
 BASE_BIN_ROOT_NAME=.bin
@@ -39,8 +40,10 @@ this-print:
 	@echo ""
 	@echo "build-mono"
 	@echo ""
-	@echo "BASE_OS_NAME:           $(BASE_OS_NAME)"
-	@echo "BASE_OS_ARCH:           $(BASE_OS_ARCH)"
+	@echo "BASE_GOOS_NAME:           $(BASE_GOOS_NAME)"
+	@echo "BASE_GOOS_ARCH:           $(BASE_GOOS_ARCH)"
+	@echo "BASE_GOOS_PATH:           $(BASE_GOOS_PATH)"
+	
 	@echo ""
 	@echo "BASE_CI_GITHUB:         $(BASE_CI_GITHUB)"
 	@echo ""
@@ -58,7 +61,7 @@ this: this-print this-dep this-src this-bin
 
 WHICH_BIN_NAME=go-which
 WHICH_BIN_TEMP_NAME=which
-ifeq ($(BASE_OS_NAME),windows)
+ifeq ($(BASE_GOOS_NAME),windows)
 ifeq ($(BASE_CI_GITHUB), )
 	WHICH_BIN_NAME=go-which.exe
 	WHICH_BIN_TEMP_NAME=which.exe
@@ -79,7 +82,7 @@ ifeq ($(WHICH_BIN_WHICH), )
 	@echo "$(WHICH_BIN_NAME) dep check: failed"
 	# https://github.com/hairyhenderson/go-which/releases/tag/v0.2.0
 	go install github.com/hairyhenderson/go-which/cmd/which@v0.2.0
-	mv $(GOPATH)/bin/$(WHICH_BIN_TEMP_NAME) $(GOPATH)/bin/$(WHICH_BIN_NAME)
+	mv $(BASE_GOOS_PATH)/bin/$(WHICH_BIN_TEMP_NAME) $(BASE_GOOS_PATH)/bin/$(WHICH_BIN_NAME)
 else
 	@echo ""
 	@echo "$(WHICH_BIN_NAME) dep check: passed"
@@ -133,7 +136,7 @@ this-bin: this-bin-print this-bin-dep spok-bin
 ### release 
 
 GH_BIN_NAME=gh
-ifeq ($(BASE_OS_NAME),windows)
+ifeq ($(BASE_GOOS_NAME),windows)
 ifeq ($(BASE_CI_GITHUB), )
 	GH_BIN_NAME=gh.exe
 endif
@@ -217,7 +220,7 @@ this-release: this-release-print this-release-dep
 
 BASE_DEP_BIN_WGOT_NAME=wgot
 BASE_DEP_BIN_WGOT_VERSION=v0.7.0
-ifeq ($(BASE_OS_NAME),windows)
+ifeq ($(BASE_GOOS_NAME),windows)
 	BASE_DEP_BIN_WGOT_NAME=wgot.exe
 endif
 BASE_DEP_BIN_WGOT_WHICH=$(shell $(WHICH_BIN_NAME) $(BASE_DEP_BIN_WGOT_NAME))
