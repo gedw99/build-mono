@@ -34,7 +34,6 @@ BASE_BIN_ROOT=$(PWD)/$(BASE_BIN_ROOT_NAME)
 export PATH:=$(BASE_BIN_ROOT):$(PATH)
 
 
-
 this-init:
 
 ifeq ($(GITHUB_ACTIONS), )
@@ -43,7 +42,7 @@ ifeq ($(GITHUB_ACTIONS), )
 else
 	@echo ""
 	@echo " Inside github "
-	$(BASE_CI)=github
+	BASE_CI=github
 	@echo ""
 endif
 
