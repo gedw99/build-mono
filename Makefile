@@ -81,7 +81,7 @@ endif
 GORELEASER_BIN_WHICH=$(shell command -v $(GORELEASER_BIN_NAME))
 this-bin-dep:
 	@echo ""
-	@echo "-- bin "
+	@echo "-- bin dep "
 	@echo ""
 	rm -rf $(BASE_BIN_ROOT)
 	mkdir -p $(BASE_BIN_ROOT)
@@ -171,7 +171,7 @@ this-release: this-release-dep
 	@echo "-- release"
 	@echo ""
 	@echo ""
-	#$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
+	$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) --generate-notes
 	#$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/* --clobber
 	$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/*
 
