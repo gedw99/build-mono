@@ -8,11 +8,12 @@ SPOK_LD_DATE=1
 SPOK_LD=-X 'github.com/FollowTheProcess/spok/cli/cmd.version=$(SPOK_LD_VERSION)' -X 'github.com/FollowTheProcess/spok/cli/cmd.commit=$(SPOK_LD_COMMIT)' -X 'github.com/FollowTheProcess/spok/cli/cmd.buildDate=$(SPOK_LD_DATE)'
 
 
-spok-print:
+spok-print: this-dep
 	@echo ""
 	@echo "--spok"
 	@echo "SPOK_BIN_NAME:     $(SPOK_BIN_NAME)"
 	@echo "SPOK_BIN_NATIVE:   $(SPOK_BIN_NATIVE)"
+	@echo "SPOK_BIN_NATIVE:   $(shell $(WHICH_BIN_NAME) $(SPOK_BIN_NATIVE))"
 	@echo "SPOK_LD:           $(SPOK_LD)"
 	@echo ""
 
