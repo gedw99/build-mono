@@ -15,10 +15,10 @@ spok-src:
 spok-bin:
 	touch go.work
 	go work use spok
-	cd spok && goreleaser build --single-target --skip=before --snapshot --clean --output $(BIN_ROOT)/spok
+	cd spok && goreleaser build --single-target --skip=before --snapshot --clean --output $(BASE_BIN_ROOT)/spok_$(BASE_BIN_SUFFIX_NATIVE)
 
 spok-install:
-	cp $(BIN_ROOT)/spok $(GOPATH)/bin/spok
+	cp $(BASE_BIN_ROOT)/spok $(GOPATH)/bin/spok
 spok-install-del:
 	rm -rf $(GOPATH)/bin/spok
 

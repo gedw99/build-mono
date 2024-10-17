@@ -1,15 +1,48 @@
 include help.mk
 
-BIN_ROOT_NAME=.bin
-BIN_ROOT=$(PWD)/$(BIN_ROOT_NAME)
+BASE_SHELL_OS_NAME := $(shell uname -s | tr A-Z a-z)
+BASE_SHELL_OS_ARCH := $(shell uname -m | tr A-Z a-z)
 
-export PATH:=$(BIN_ROOT):$(PATH)
+# os
+BASE_OS_NAME := $(shell go env GOOS)
+BASE_OS_ARCH := $(shell go env GOARCH)
+
+BASE_GITROOT=$(shell git rev-parse --show-toplevel)
+
+# constants for bin targets
+BASE_BIN_SUFFIX_DARWIN_AMD64=bin_darwin_amd64
+BASE_BIN_SUFFIX_DARWIN_ARM64=bin_darwin_arm64
+BASE_BIN_SUFFIX_LINUX_AMD64=bin_linux_amd64
+BASE_BIN_SUFFIX_LINUX_ARM64=bin_linux_arm64
+BASE_BIN_SUFFIX_WINDOWS_AMD64=bin_windows_amd64.exe
+BASE_BIN_SUFFIX_WINDOWS_ARM64=bin_windows_arm64.exe
+BASE_BIN_SUFFIX_WASM=bin_js_wasm
+
+# used for naming all binaries suffix.
+BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_OS_NAME)_$(BASE_OS_ARCH)
+ifeq ($(BASE_OS_NAME),windows)
+	BASE_BIN_SUFFIX_NATIVE=bin_$(BASE_OS_NAME)_$(BASE_OS_ARCH).exe
+endif
+
+
+BASE_BIN_ROOT_NAME=.bin
+BASE_BIN_ROOT=$(PWD)/$(BASE_BIN_ROOT_NAME)
+
+export PATH:=$(BASE_BIN_ROOT):$(PATH)
 
 ## print
 this-print:
 	@echo ""
 	@echo "build-mono"
-	@echo "BIN_ROOT: $(BIN_ROOT)"
+	@echo ""
+	@echo "BASE_OS_NAME: $(BASE_OS_NAME)"
+	@echo "BASE_OS_ARCH: $(BASE_OS_ARCH)"
+	@echo ""
+	@echo "BASE_GITROOT: $(BASE_GITROOT)"
+	@echo ""
+	@echo "BASE_BIN_SUFFIX_NATIVE: $(BASE_BIN_SUFFIX_NATIVE)"
+	@echo ""
+	@echo "BASE_BIN_ROOT: $(BASE_BIN_ROOT)"
 	@echo ""
 
 include spok.mk
@@ -28,9 +61,9 @@ this-src: spok-src
 GORELEASER_BIN_NAME=goreleaser
 GORELEASER_BIN_WHICH=$(shell command -v $(GORELEASER_BIN_NAME))
 this-bin-dep:
-	rm -rf $(BIN_ROOT)
-	mkdir -p $(BIN_ROOT)
-	@echo $(BIN_ROOT_NAME) >> .gitignore
+	rm -rf $(BASE_BIN_ROOT)
+	mkdir -p $(BASE_BIN_ROOT)
+	@echo $(BASE_BIN_ROOT_NAME) >> .gitignore
 
 ifeq ($(GORELEASER_BIN_WHICH), )
 	@echo ""
@@ -82,7 +115,7 @@ this-release: this-release-dep
 	#$(GH_BIN_NAME) release create $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/spok
 	
 	#gh release upload -h
-	$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/spok --clobber
+	$(GH_BIN_NAME) release upload $(GH_RUN_RELEASE_TAG) $(PWD)/.bin/* --clobber
 
 	@echo ""
 	@echo "https://github.com/gedw99/build-mono/releases/tag/$(GH_RUN_RELEASE_TAG)"
