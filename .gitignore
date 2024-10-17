@@ -22,6 +22,9 @@
 go.work
 go.work.sum
 
+.bin
+.bin-download
+
 # env file
 .env
 spok
@@ -55,3 +58,13 @@ spok
 .bin
 .bin
 .bin
+
+.bin_download
+.bin_download
+.bin_download
+.bin_download
+.bin_download
+.bin_download
+.bin_download
+.bin_download
+.bin_download
