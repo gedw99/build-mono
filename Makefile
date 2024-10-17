@@ -8,7 +8,7 @@ BASE_OS_NAME := $(shell go env GOOS)
 BASE_OS_ARCH := $(shell go env GOARCH)
 
 # ci
-BASE_CI=
+BASE_CI_GITHUB=$(GITHUB_ACTIONS)
 
 # git
 BASE_GITROOT=$(shell git rev-parse --show-toplevel)
@@ -34,27 +34,15 @@ BASE_BIN_ROOT=$(PWD)/$(BASE_BIN_ROOT_NAME)
 export PATH:=$(BASE_BIN_ROOT):$(PATH)
 
 
-this-init:
-
-ifeq ($(GITHUB_ACTIONS), )
-	@echo ""
-	@echo " NOT inside github "
-else
-	@echo ""
-	@echo " Inside github "
-	BASE_CI=github
-	@echo ""
-endif
-
 ## print
-this-print: this-init
+this-print: 
 	@echo ""
 	@echo "build-mono"
 	@echo ""
 	@echo "BASE_OS_NAME:           $(BASE_OS_NAME)"
 	@echo "BASE_OS_ARCH:           $(BASE_OS_ARCH)"
 	@echo ""
-	@echo "BASE_CI:                $(BASE_CI)"
+	@echo "BASE_CI_GITHUB:         $(BASE_CI_GITHUB)"
 	@echo ""
 	@echo "BASE_GITROOT:           $(BASE_GITROOT)"
 	@echo ""
@@ -111,7 +99,7 @@ this-bin: this-bin-print this-bin-dep spok-bin
 
 GH_BIN_NAME=gh
 ifeq ($(BASE_OS_NAME),windows)
-ifeq ($(BASE_CI),)
+ifeq ($(BASE_CI_GITHUB), )
 	GH_BIN_NAME=gh.exe
 endif
 endif
